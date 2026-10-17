@@ -45,8 +45,9 @@ PUT    /customer/auth/review/:isbn  JSON: review (or ?review=...)
 DELETE /customer/auth/review/:isbn  Delete only the logged-in user's review
 
 Use curl -c cookies.txt during login and -b cookies.txt for review changes.
-evidence/credentials.json contains only fictional demo credentials, ready for
---data-binary "@credentials.json". Do not use them for a real account.
+The evidence script generates evidence/credentials.json locally with fictional
+demo credentials for --data-binary "@credentials.json". This file is ignored by
+Git and is not published. Do not use those credentials for a real account.
 The initial reviews are genuinely empty: {}. reviewadded.txt and
 reviewupdated.txt show both creation and replacement of the user's review.
 Evidence uses the available port assigned during its recorded run; use port

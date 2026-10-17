@@ -2,5 +2,6 @@
 node_modules
 cookies.txt
 .env
+/evidence/credentials.json
 
 
