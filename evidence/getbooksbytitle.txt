@@ -1,0 +1,8 @@
+$ curl.exe --silent --show-error --fail-with-body --max-time 20 http://127.0.0.1:52821/title/Things%20Fall%20Apart
+{
+  "1": {
+    "author": "Chinua Achebe",
+    "title": "Things Fall Apart",
+    "reviews": {}
+  }
+}

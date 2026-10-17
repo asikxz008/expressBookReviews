@@ -1,0 +1,4 @@
+$ curl.exe --silent --show-error --fail-with-body --max-time 20 -X POST -H "Content-Type: application/json" --data-binary "@credentials.json" http://127.0.0.1:52821/register
+{
+  "message": "User successfully registered. You can now log in."
+}

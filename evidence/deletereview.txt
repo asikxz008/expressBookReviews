@@ -1,0 +1,5 @@
+$ curl.exe --silent --show-error --fail-with-body --max-time 20 -X DELETE -b cookies.txt http://127.0.0.1:52821/customer/auth/review/1
+{
+  "message": "Review successfully deleted",
+  "reviews": {}
+}

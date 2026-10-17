@@ -1,0 +1,7 @@
+$ curl.exe --silent --show-error --fail-with-body --max-time 20 -X PUT -b cookies.txt http://127.0.0.1:52821/customer/auth/review/1?review=A%20thought-provoking%20book.
+{
+  "message": "Review successfully added",
+  "reviews": {
+    "student_demo": "A thought-provoking book."
+  }
+}

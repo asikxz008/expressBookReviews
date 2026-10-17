@@ -1,0 +1,5 @@
+$ curl.exe --silent --show-error --fail-with-body --max-time 20 -X POST -H "Content-Type: application/json" --data-binary "@credentials.json" -c cookies.txt http://127.0.0.1:52821/customer/login
+{
+  "message": "Customer successfully logged in",
+  "username": "student_demo"
+}
