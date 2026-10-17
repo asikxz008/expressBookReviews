@@ -1,43 +1,61 @@
 const express = require('express');
-let books = require("./booksdb.js");
-let isValid = require("./auth_users.js").isValid;
-let users = require("./auth_users.js").users;
+const axios = require('axios');
+const books = require('./catalog');
+const { registerUser } = require('./auth_users');
 const public_users = express.Router();
 
-
-public_users.post("/register", (req,res) => {
-  //Write your code here
-  return res.status(300).json({message: "Yet to be implemented"});
+public_users.post('/register', async (req, res, next) => {
+  try {
+    await registerUser(req.body.username, req.body.password);
+    res.status(201).json({ message: 'User successfully registered. You can now log in.' });
+  } catch (error) { next(error); }
+});
+public_users.get('/', (req, res) => res.json(books));
+public_users.get('/isbn/:isbn', (req, res) => {
+  if (!Object.hasOwn(books, req.params.isbn)) return res.status(404).json({ message: 'Book not found' });
+  res.json(books[req.params.isbn]);
+});
+for (const field of ['author', 'title']) {
+  public_users.get(`/${field}/:${field}`, (req, res) => {
+    const query = req.params[field].trim().toLocaleLowerCase();
+    const matches = Object.fromEntries(Object.entries(books).filter(([, book]) => book[field].toLocaleLowerCase() === query));
+    if (!Object.keys(matches).length) return res.status(404).json({ message: 'No matching books found' });
+    res.json(matches);
+  });
+}
+public_users.get('/review/:isbn', (req, res) => {
+  if (!Object.hasOwn(books, req.params.isbn)) return res.status(404).json({ message: 'Book not found' });
+  res.json(books[req.params.isbn].reviews);
 });
 
-// Get the book list available in the shop
-public_users.get('/',function (req, res) {
-  //Write your code here
-  return res.status(300).json({message: "Yet to be implemented"});
-});
-
-// Get book details based on ISBN
-public_users.get('/isbn/:isbn',function (req, res) {
-  //Write your code here
-  return res.status(300).json({message: "Yet to be implemented"});
- });
-  
-// Get book details based on author
-public_users.get('/author/:author',function (req, res) {
-  //Write your code here
-  return res.status(300).json({message: "Yet to be implemented"});
-});
-
-// Get all books based on title
-public_users.get('/title/:title',function (req, res) {
-  //Write your code here
-  return res.status(300).json({message: "Yet to be implemented"});
-});
-
-//  Get book review
-public_users.get('/review/:isbn',function (req, res) {
-  //Write your code here
-  return res.status(300).json({message: "Yet to be implemented"});
-});
-
-module.exports.general = public_users;
+// Tasks 11-14: Axios makes real HTTP requests to the public API above.
+// The routes read the catalog directly, so requests never recurse.
+function createBookClient(baseURL = process.env.BOOKSHOP_URL || 'http://127.0.0.1:5000') {
+  const client = axios.create({ baseURL, timeout: 5000, proxy: false });
+  return {
+    // Async/await with optional Node-style callback.
+    async getAllBooks(callback) {
+      let data;
+      try { ({ data } = await client.get('/')); }
+      catch (error) {
+        if (callback) { callback(error); return; }
+        throw error;
+      }
+      if (callback) callback(null, data);
+      return data;
+    },
+    // Promise callback for ISBN lookup.
+    getBooksByISBN(isbn) {
+      return client.get(`/isbn/${encodeURIComponent(isbn)}`).then(response => response.data);
+    },
+    async getBooksByAuthor(author) {
+      const { data } = await client.get(`/author/${encodeURIComponent(author)}`);
+      return data;
+    },
+    async getBooksByTitle(title) {
+      const { data } = await client.get(`/title/${encodeURIComponent(title)}`);
+      return data;
+    }
+  };
+}
+module.exports = { general: public_users, createBookClient };
